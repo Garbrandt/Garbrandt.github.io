@@ -151,10 +151,10 @@
                         <div v-if="isReading === false" class="section-content vcentered">
                             <h1>内容载入中</h1>
                         </div>
-                        <div  v-if="isReading === true" class="single-page-content">
+                        <div v-if="isReading === true" class="single-page-content">
                             <article class="post">
                                 <div class="post-thumbnail">
-                                    <img src="img/blog/blog_post_1_full.jpg" alt="image">
+                                    <img :src="content.body | getThumbnail" alt="image">
                                 </div>
 
                                 <div class="post-content">
@@ -186,44 +186,19 @@
                                         <div class="date-author">
                               <span class="entry-date">
                                 <a href="#" rel="bookmark">
-                                  <i class="far fa-clock"></i> <span class="entry-date"> March 16, 2020</span>
+                                  <i class="far fa-clock"></i> <span class="entry-date">{{content.updated_at | formatDate}}</span>
                                 </a>
                               </span>
                                             <span class="author vcard">
-                                <a class="url fn n" href="#" rel="author"> <i class="fas fa-user"></i> LMPixels</a>
+                                <a class="url fn n" href="#" rel="author"> <i class="fas fa-user"></i>{{content.user.login}}</a>
                               </span>
                                         </div>
 
-                                        <!-- Share Buttons -->
-                                        <div class="entry-share btn-group share-buttons">
-                                            <a href="#"
-                                               onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-                                               class="btn" target="_blank" title="Share on Facebook">
-                                                <i class="fab fa-facebook-f"></i>
-                                            </a>
-
-                                            <a href="#"
-                                               onclick="javascript:window.open(this.href, '', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=300,width=600');return false;"
-                                               class="btn" target="_blank" title="Share on Twitter">
-                                                <i class="fab fa-twitter"></i>
-                                            </a>
-
-                                            <a href="#"
-                                               onclick="javascript:window.open(this.href,'', 'menubar=no,toolbar=no,resizable=yes,scrollbars=yes,height=600,width=600');return false;"
-                                               class="btn" title="Share on LinkedIn">
-                                                <i class="fab fa-linkedin-in"></i>
-                                            </a>
-                                        </div>
-                                        <!-- /Share Buttons -->
                                     </div>
 
                                     <div class="post-tags">
                                         <div class="tags">
-                                            <a href="#" rel="tag">animate</a>
-                                            <a href="#" rel="tag">bar</a>
-                                            <a href="#" rel="tag">design</a>
-                                            <a href="#" rel="tag">progress</a>
-                                            <a href="#" rel="tag">ui</a>
+                                            <a rel="tag" v-for="(label,index) in content.labels">{{label}}</a>
                                         </div>
                                     </div>
                                 </div>
@@ -686,7 +661,8 @@
                                                     </div>
                                                     <a href="#detail" v-on:click="showBlogDetail(item)">
                                                         <img :src="item.body | getThumbnail"
-                                                             class="size-blog-masonry-image-two-c post-image" style="height: 120px"
+                                                             class="size-blog-masonry-image-two-c post-image"
+                                                             style="height: 120px"
                                                              alt="Why I Switched to Sketch For UI Design" title=""/>
                                                         <div class="mask"></div>
                                                     </a>
