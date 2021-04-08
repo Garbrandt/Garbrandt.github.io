@@ -218,8 +218,19 @@ let github_about = "我知道你也不想知道";
                     console.log("---", val)
                     return ["vuejs"];
                 },
-                getThumbnail(val) {
+                getThumbnail(str) {
                     console.log("获取封面")
+                    const regex = /http?s?:?\/\/[^"']*\.(?:png|jpg|jpeg|gif|png|svg)/;
+                    let m;
+
+                    if ((m = regex.exec(str)) !== null) {
+                        // The result can be accessed through the `m`-variable.
+                        for (let el of m) {
+                            console.log(el);
+                            return el
+                        }
+                    }
+
                     return "img/blog/blog_post_1.jpg"
                 },
             }
