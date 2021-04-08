@@ -4,23 +4,15 @@ let github_repo = "Garbrandt.github.io";
 let per_page = 6;
 let nickname = "石头少年";
 let profession = "程序员";
+let qrcode = "https://u.wechat.com/MBZ5MHdri3A0ipdEEZXlduc";
+let github_location = "杭州";
+let github_phone = "手机没交费";
+let github_motto = "Do what you love,Love what you do.";
+let github_about = "我知道你也不想知道";
+
 
 (function ($) {
     "use strict";
-
-    function portfolio_init() {
-        var portfolio_grid = $('.portfolio-grid'), portfolio_filter = $('.portfolio-filters');
-        if (portfolio_grid) {
-            portfolio_grid.shuffle({speed: 450, itemSelector: 'figure'});
-            portfolio_filter.on("click", ".filter", function (e) {
-                portfolio_grid.shuffle('update');
-                e.preventDefault();
-                $('.portfolio-filters .filter').parent().removeClass('active');
-                $(this).parent().addClass('active');
-                portfolio_grid.shuffle('shuffle', $(this).attr('data-group'));
-            });
-        }
-    }
 
     function mobileMenuHide() {
         let windowWidth = $(window).width(), siteHeader = $('#site_header');
@@ -35,39 +27,6 @@ let profession = "程序员";
         }
     }
 
-    function customScroll() {
-        var windowWidth = $(window).width();
-        if (windowWidth > 1024) {
-            $('.animated-section, .single-page-content').each(function () {
-                $(this).perfectScrollbar();
-            });
-        } else {
-            $('.animated-section, .single-page-content').each(function () {
-                $(this).perfectScrollbar('destroy');
-            });
-        }
-    }
-
-    $(function () {
-        $('#contact_form').validator();
-        $('#contact_form').on('submit', function (e) {
-            if (!e.isDefaultPrevented()) {
-                var url = "contact_form/contact_form.php";
-                $.ajax({
-                    type: "POST", url: url, data: $(this).serialize(), success: function (data) {
-                        var messageAlert = 'alert-' + data.type;
-                        var messageText = data.message;
-                        var alertBox = '<div class="alert ' + messageAlert + ' alert-dismissable"><button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>' + messageText + '</div>';
-                        if (messageAlert && messageText) {
-                            $('#contact_form').find('.messages').html(alertBox);
-                            $('#contact_form')[0].reset();
-                        }
-                    }
-                });
-                return false;
-            }
-        });
-    });
     $(window).on('load', function () {
         $(".preloader").fadeOut(800, "linear");
         var ptPage = $('.animated-sections');
@@ -100,15 +59,13 @@ let profession = "程序员";
             $('.menu-toggle').toggleClass('open');
         });
         $('.main-menu').on("click", "a", function (e) {
+            console.log("也是")
             mobileMenuHide();
         });
         $('.sidebar-toggle').on("click", function () {
             $('#blog-sidebar').toggleClass('open');
         });
-        var $portfolio_container = $(".portfolio-grid");
-        $portfolio_container.imagesLoaded(function () {
-            portfolio_init(this);
-        });
+
         var $container = $(".blog-masonry");
         $container.imagesLoaded(function () {
             $container.masonry();
@@ -153,31 +110,6 @@ let profession = "程序员";
                 $(this).parent('.form-group').removeClass('form-group-focus');
             }
         });
-        $('body').magnificPopup({
-            delegate: 'a.lightbox',
-            type: 'image',
-            removalDelay: 300,
-            mainClass: 'mfp-fade',
-            image: {titleSrc: 'title', gallery: {enabled: true},},
-            iframe: {
-                markup: '<div class="mfp-iframe-scaler">' +
-                    '<div class="mfp-close"></div>' +
-                    '<iframe class="mfp-iframe" frameborder="0" allowfullscreen></iframe>' +
-                    '<div class="mfp-title mfp-bottom-iframe-title"></div>' +
-                    '</div>',
-                patterns: {
-                    youtube: {index: 'youtube.com/', id: null, src: '%id%?autoplay=1'},
-                    vimeo: {index: 'vimeo.com/', id: '/', src: '//player.vimeo.com/video/%id%?autoplay=1'},
-                    gmaps: {index: '//maps.google.', src: '%id%&output=embed'}
-                },
-                srcAction: 'iframe_src',
-            },
-            callbacks: {
-                markupParse: function (template, values, item) {
-                    values.title = item.el.attr('title');
-                }
-            },
-        });
 
         const api_host = 'https://api.github.com'
 
@@ -195,6 +127,12 @@ let profession = "程序员";
                 page: 0,
                 labels: [],
                 isReading: false,
+                content: null,
+                render: true,
+                location: github_location,
+                phone: github_phone,
+                motto: github_motto,
+                about: github_about,
             },
             components: {},
             created() {
@@ -224,10 +162,16 @@ let profession = "程序员";
                         console.log(err)
                     })
                 },
-                getPostDetail(param) {
-                    let link = api_host + `/repos/${this.user}/${this.repo}/issues/${param.post_id}`
+                showBlogDetail(item) {
+                    console.log(item)
+                    this.getPostDetail(item.number)
+                },
+                getPostDetail(number) {
+                    let link = api_host + `/repos/${this.user}/${this.repo}/issues/${number}`
                     axios.get(link, {params: {answer: 42}}).then(res => {
-
+                        this.content = res.data
+                        console.log("222", this.content)
+                        this.isReading = true
                     }).catch(err => {
                         console.log(err)
                     })
@@ -250,13 +194,18 @@ let profession = "程序员";
                     })
                 },
                 endReading: function () {
-                    console.log("----")
                     this.isReading = false
+                    this.content = null
+                    this.render = false
+                    this.render = true
                 },
+                compiledMarkdown: function (val) {
+                    return marked(val, {sanitize: true});
+                }
             },
             computed: {
                 newQRCode() {
-                    this.qrcode.value = "hello";
+                    this.qrcode.value = qrcode;
                     return this.qrcode.toDataURL();
                 },
             },
@@ -268,7 +217,11 @@ let profession = "程序员";
                 formatLabels(val) {
                     console.log("---", val)
                     return ["vuejs"];
-                }
+                },
+                getThumbnail(val) {
+                    console.log("获取封面")
+                    return "img/blog/blog_post_1.jpg"
+                },
             }
         })
     });
