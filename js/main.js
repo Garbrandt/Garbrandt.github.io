@@ -200,7 +200,7 @@ let github_about = "我知道你也不想知道";
                     this.render = true
                 },
                 compiledMarkdown: function (val) {
-                    return marked(val, {sanitize: true});
+                    return marked(val);
                 }
             },
             computed: {
